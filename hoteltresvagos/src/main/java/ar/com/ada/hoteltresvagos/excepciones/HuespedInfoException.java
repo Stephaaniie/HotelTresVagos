@@ -2,9 +2,6 @@ package ar.com.ada.hoteltresvagos.excepciones;
 
 import ar.com.ada.hoteltresvagos.entities.Huesped;
 
-/**
- * HuespedInfoException
- */
 public class HuespedInfoException extends Exception {
 
     private Huesped huesped;

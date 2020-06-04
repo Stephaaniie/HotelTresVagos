@@ -20,10 +20,7 @@ public class HuespedManager {
     public void setup() {
 
         java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
-        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure() // configures settings
-                                                                                                  // from
-                                                                                                  // hibernate.cfg.xml
-                .build();
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
         try {
             sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
         } catch (Exception ex) {
@@ -128,7 +125,6 @@ public class HuespedManager {
         Query query = session.createNativeQuery("SELECT * FROM huesped where nombre = '" + nombre + "'", Huesped.class);
 
         List<Huesped> huespedes = query.getResultList();
-
         return huespedes;
 
     }

@@ -1,12 +1,14 @@
 package ar.com.ada.hoteltresvagos;
 
-import java.util.List;
-import java.util.Scanner;
+import java.math.BigDecimal;
 
-import ar.com.ada.hoteltresvagos.entities.Huesped;
-import ar.com.ada.hoteltresvagos.excepciones.HuespedDNIException;
+import java.text.*;
+
+import java.util.*;
+
+import ar.com.ada.hoteltresvagos.entities.*;
+
 import ar.com.ada.hoteltresvagos.managers.HuespedManager;
-
 
 public class ABM {
 
@@ -15,104 +17,124 @@ public class ABM {
     protected HuespedManager ABMHuesped = new HuespedManager();
 
     public void iniciar() throws Exception {
-
         try {
-
             ABMHuesped.setup();
-
             printOpciones();
-
             int opcion = Teclado.nextInt();
             Teclado.nextLine();
 
             while (opcion > 0) {
-
-                switch (opcion) {
-                    case 1:
-
-                        try {
-                            alta();
-                        } catch (HuespedDNIException exdni) {
-                            System.out.println("Error en el DNI. Indique uno valido");
-                        }
-                        break;
-
-                    case 2:
-                        baja();
-                        break;
-
-                    case 3:
-                        modifica();
-                        break;
-
-                    case 4:
-                        listar();
-                        break;
-
-                    case 5:
-                        listarPorNombre();
-                        break;
-
-                    default:
-                        System.out.println("La opcion no es correcta.");
-                        break;
-                }
-
+                opcionesUsuario(opcion);
                 printOpciones();
-
                 opcion = Teclado.nextInt();
                 Teclado.nextLine();
             }
-
-            // Hago un safe exit del manager
             ABMHuesped.exit();
-
         } catch (Exception e) {
-            // TODO: handle exception
             System.out.println("Que lindo mi sistema,se rompio mi sistema");
             throw e;
         } finally {
             System.out.println("Saliendo del sistema, bye bye...");
-
         }
+    }
 
+    public void opcionesUsuario(int opcion) throws Exception {
+        switch (opcion) {
+            case 1:
+                alta();
+                break;
+            case 2:
+                baja();
+                break;
+            case 3:
+                modifica();
+                break;
+            case 4:
+                listar();
+                break;
+            case 5:
+                listarPorNombre();
+                break;
+            default:
+                System.out.println("La opcion no es correcta.");
+                break;
+        }
     }
 
     public void alta() throws Exception {
         Huesped huesped = new Huesped();
         System.out.println("Ingrese el nombre:");
         huesped.setNombre(Teclado.nextLine());
+
         System.out.println("Ingrese el DNI:");
-        huesped.setDni(Teclado.nextInt());
-        Teclado.nextLine();
+        huesped.setDni(Teclado.nextLine());
+
         System.out.println("Ingrese la domicilio:");
         huesped.setDomicilio(Teclado.nextLine());
 
         System.out.println("Ingrese el Domicilio alternativo(OPCIONAL):");
-
         String domAlternativo = Teclado.nextLine();
-
         if (domAlternativo != null)
             huesped.setDomicilioAlternativo(domAlternativo);
 
-        
-        ABMHuesped.create(huesped);
+        crearAlta(huesped);
+    }
 
-        /*
-         * Si concateno el OBJETO directamente, me trae todo lo que este en el metodo
-         * toString() mi recomendacion es NO usarlo para imprimir cosas en pantallas, si
-         * no para loguear info Lo mejor es usar:
-         * System.out.println("Huesped generada con exito.  " + huesped.getHuespedId);
-         */
+    private void crearAlta(Huesped huesped) throws Exception {
+        Reserva reserva = generarReserva();
+        ReservaController controller = new ReservaController(reserva, huesped);
 
-        System.out.println("Huesped generada con exito.  " + huesped);
+        if (controller.reservaValida()) {
+            reserva.setHuesped(huesped);
+            ABMHuesped.create(huesped);
+            System.out.println("Huesped generada con exito.  " + huesped);
+        } else {
+            alta();
+        }
+    }
 
+    public Reserva generarReserva(){
+        Reserva reserva = new Reserva();
+
+        reserva.setImporteReserva(new BigDecimal(1000));
+
+        reserva.setImporteTotal(new BigDecimal(3000));
+
+        reserva.setImportePagado(new BigDecimal(0));
+
+        reserva.setFechaReserva(new Date());
+
+        reserva.setFechaIngreso(ingresarFecha(reserva, "Ingreso"));
+
+        reserva.setFechaEgreso(ingresarFecha(reserva, "Engreso"));
+
+        return reserva;
+    }
+
+    public Date ingresarFecha(Reserva reserva, String tipo) {
+        Date fechaValida = null;
+
+        boolean esValida = true;
+
+        DateFormat dFormat = new SimpleDateFormat("dd/MM/yy");
+        do {
+            esValida = true;
+            System.out.println("Ingrese la fecha de " + tipo + " (dd/mm/yy)");
+            try {
+                fechaValida = dFormat.parse(Teclado.nextLine());            
+            } catch (Exception e) {
+                System.out.println("Error al ingresar fecha ");
+                esValida = false;
+            }
+        }while(!esValida);
+        return fechaValida;
     }
 
     public void baja() {
         System.out.println("Ingrese el nombre:");
         String nombre = Teclado.nextLine();
         System.out.println("Ingrese el ID de Huesped:");
+
         int id = Teclado.nextInt();
         Teclado.nextLine();
         Huesped huespedEncontrado = ABMHuesped.read(id);
@@ -121,16 +143,13 @@ public class ABM {
             System.out.println("Huesped no encontrado.");
 
         } else {
-
             try {
-
                 ABMHuesped.delete(huespedEncontrado);
                 System.out
                         .println("El registro del huesped " + huespedEncontrado.getHuespedId() + " ha sido eliminado.");
             } catch (Exception e) {
                 System.out.println("Ocurrio un error al eliminar una huesped. Error: " + e.getCause());
             }
-
         }
     }
 
@@ -178,7 +197,7 @@ public class ABM {
                 case 2:
                     System.out.println("Ingrese el nuevo DNI:");
                     Teclado.nextLine();
-                    huespedEncontrado.setDni(Teclado.nextInt());
+                    huespedEncontrado.setDni(Teclado.nextLine());
                     Teclado.nextLine();
 
                     break;
@@ -212,7 +231,6 @@ public class ABM {
     }
 
     public void listar() {
-
         List<Huesped> todos = ABMHuesped.buscarTodos();
         for (Huesped c : todos) {
             mostrarHuesped(c);
@@ -238,8 +256,6 @@ public class ABM {
 
         if (huesped.getDomicilioAlternativo() != null)
             System.out.println(" Alternativo: " + huesped.getDomicilioAlternativo());
-        else
-            System.out.println();
     }
 
     public static void printOpciones() {
