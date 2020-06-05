@@ -9,6 +9,7 @@ import java.util.*;
 import ar.com.ada.hoteltresvagos.entities.*;
 
 import ar.com.ada.hoteltresvagos.managers.HuespedManager;
+import ar.com.ada.hoteltresvagos.managers.ReservaManager;
 
 public class ABM {
 
@@ -16,9 +17,12 @@ public class ABM {
 
     protected HuespedManager ABMHuesped = new HuespedManager();
 
+    protected ReservaManager ABMReserva = new  ReservaManager();
+
     public void iniciar() throws Exception {
         try {
             ABMHuesped.setup();
+            ABMReserva.setup();
             printOpciones();
             int opcion = Teclado.nextInt();
             Teclado.nextLine();
@@ -55,6 +59,12 @@ public class ABM {
             case 5:
                 listarPorNombre();
                 break;
+            case 6:
+                listarPorNombre();
+                break;
+            case 7:
+                listarReservas();
+                break;
             default:
                 System.out.println("La opcion no es correcta.");
                 break;
@@ -67,7 +77,7 @@ public class ABM {
         huesped.setNombre(Teclado.nextLine());
 
         System.out.println("Ingrese el DNI:");
-        huesped.setDni(Teclado.nextLine());
+        huesped.setDni(Teclado.nextInt());
 
         System.out.println("Ingrese la domicilio:");
         huesped.setDomicilio(Teclado.nextLine());
@@ -76,21 +86,10 @@ public class ABM {
         String domAlternativo = Teclado.nextLine();
         if (domAlternativo != null)
             huesped.setDomicilioAlternativo(domAlternativo);
-
-        crearAlta(huesped);
-    }
-
-    private void crearAlta(Huesped huesped) throws Exception {
         Reserva reserva = generarReserva();
-        ReservaController controller = new ReservaController(reserva, huesped);
-
-        if (controller.reservaValida()) {
-            reserva.setHuesped(huesped);
-            ABMHuesped.create(huesped);
-            System.out.println("Huesped generada con exito.  " + huesped);
-        } else {
-            alta();
-        }
+        reserva.setHuesped(huesped);
+        ABMHuesped.create(huesped);
+        System.out.println("Huesped generada con exito.  " + huesped);
     }
 
     public Reserva generarReserva(){
@@ -197,7 +196,7 @@ public class ABM {
                 case 2:
                     System.out.println("Ingrese el nuevo DNI:");
                     Teclado.nextLine();
-                    huespedEncontrado.setDni(Teclado.nextLine());
+                    huespedEncontrado.setDni(Teclado.nextInt());
                     Teclado.nextLine();
 
                     break;
@@ -237,6 +236,12 @@ public class ABM {
         }
     }
 
+    public void listarReservas(){
+        List<Reserva> todas = ABMReserva.buscarTodas();
+        for (Reserva x : todas) {
+            mostrarReserva(x);
+        }
+    }
     public void listarPorNombre() {
 
         System.out.println("Ingrese el nombre:");
@@ -246,6 +251,18 @@ public class ABM {
         for (Huesped huesped : huespedes) {
             mostrarHuesped(huesped);
         }
+    }
+
+    public void mostrarReserva(Reserva reserva) {
+
+        System.out.print("Id: " + reserva.getReservaId() + " Nombre: " + reserva.getHuesped().getNombre()
+        + "Importe pagado: "   +reserva.getImportePagado()
+        + "Importe reserva: "  + reserva.getImporteReserva()
+        + "Importe Total: "    + reserva.getImporteTotal()
+        + "Fecha de Reserva: " + reserva.getFechaReserva()
+        + "Fecha de Engreso: " + reserva.getFechaEgreso()
+        + "Fecha de Ingreso: " + reserva.getFechaIngreso()
+        + "Estado: " + reserva.getTipoEstado());
     }
 
     public void mostrarHuesped(Huesped huesped) {
@@ -266,6 +283,8 @@ public class ABM {
         System.out.println("3. Para modificar un huesped.");
         System.out.println("4. Para ver el listado.");
         System.out.println("5. Buscar un huesped por nombre especifico(SQL Injection)).");
+        System.out.println("6. Agregar una reserva.");
+        System.out.println("7. Para ver el listado de reservas.");
         System.out.println("0. Para terminar.");
         System.out.println("");
         System.out.println("=======================================");

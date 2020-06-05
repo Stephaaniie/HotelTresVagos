@@ -1,37 +1,51 @@
 package ar.com.ada.hoteltresvagos.entities;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
-import ar.com.ada.hoteltresvagos.excepciones.*;
+import ar.com.ada.hoteltresvagos.excepciones.HuespedDNIException;
 
 @Entity
 @Table(name = "huesped")
 public class Huesped {
-    
     @Id
     @Column(name = "huesped_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int huespedId;
-    
+
+    @NotNull
+    @Size(min = 5, max = 20)
     private String nombre;
-   
-    private String dni;
+
+    @NotNull
+    @Size(min = 0, max = 8)
+    private int dni;
     
+    @NotNull
+    @Size(min = 5, max = 50)
     private String domicilio;
-    
+
+    @Size(min = 5, max = 50)
     @Column(name = "domicilio_alternativo")
     private String domicilioAlternativo;
 
-    @OneToMany(mappedBy = "huesped", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "huesped", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Reserva> reservas = new ArrayList<>();   
 
     public Huesped(String nombre) {
         this.nombre = nombre;
-
     }
 
     public Huesped() {
@@ -53,11 +67,11 @@ public class Huesped {
         this.nombre = nombre;
     }
 
-    public void setDni(String dni) throws HuespedDNIException {
+    public void setDni(int dni) throws HuespedDNIException {
         this.dni = dni;
     }
 
-    public String getDni() {
+    public int getDni() {
         return dni;
     }
 
