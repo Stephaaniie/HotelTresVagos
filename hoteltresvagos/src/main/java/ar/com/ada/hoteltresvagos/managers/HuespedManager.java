@@ -129,4 +129,8 @@ public class HuespedManager {
 
     }
 
+	public List<Huesped> buscarPor(int tipo) {
+		return null;
+	}
+
 }

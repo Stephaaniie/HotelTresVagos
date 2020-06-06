@@ -139,12 +139,4 @@ public class Reserva {
         this.huesped = huesped;
         this.huesped.getReservas().add(this);
     }
-
-    // double1 = 0;
-    // double2 = 1;
-    // double3 = double + double2;
-
-    // BigDecimal importe = new BigDecima(0);
-    // BigDecimal importe2 = new BigDecimal(1);
-    // BigDecimal importe3 = importe.add(importe2);
 }

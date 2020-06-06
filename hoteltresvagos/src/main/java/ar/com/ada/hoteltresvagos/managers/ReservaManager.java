@@ -1,5 +1,6 @@
 package ar.com.ada.hoteltresvagos.managers;
 
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -19,7 +20,6 @@ public class ReservaManager {
 protected SessionFactory sessionFactory;
 
     public void setup() {
-
         java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
         final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
         try {
@@ -28,7 +28,6 @@ protected SessionFactory sessionFactory;
             StandardServiceRegistryBuilder.destroy(registry);
             throw ex;
         }
-
     }
 
     public void exit() {
@@ -85,14 +84,10 @@ protected SessionFactory sessionFactory;
  * @return
  */
     public List<Reserva> buscarTodas() {
-
         Session session = sessionFactory.openSession();
-
         Query query = session.createNativeQuery("SELECT * FROM reserva", Reserva.class);
         List<Reserva> todos = query.getResultList();
-
         return todos;
-
     }
 
 /**
@@ -102,12 +97,29 @@ protected SessionFactory sessionFactory;
  * @param nombre
  * @return
  */
-    public List<Reserva> buscarPor(String nombre) {
+
+    public List<Reserva> buscarTodas(String nombre) {
         Session session = sessionFactory.openSession();
-
         Query query = session.createNativeQuery("SELECT * FROM reserva where nombre = '" + nombre + "'", Reserva.class);
+        List<Reserva> reservas = query.getResultList();
+	    return reservas;
+    }
 
-        List<Reserva> huespedes = query.getResultList();
-        return huespedes;
+    public List<Reserva> buscarTodas(int tipo, String dato) {
+        Session session = sessionFactory.openSession();
+        List<Reserva> reservas;
+        if(dato.equals("dni")){
+            Query query = session.createNativeQuery("select * from huesped where dni = " + tipo, Reserva.class);
+            reservas = query.getResultList();
+        }else{
+            Query query = session.createNativeQuery("select * from huesped where huesped_id = "+ tipo, Reserva.class);
+            reservas = query.getResultList();
+        }
+	    return reservas;
+    }
+
+    public List<Reserva> buscarTodas(Date ingresarFecha) {
+        Session session = sessionFactory.openSession();
+	    return null;
     }
 }
