@@ -1,4 +1,4 @@
-package ar.com.ada.hoteltresvagos.Interfaz;
+package ar.com.ada.hoteltresvagos.operadores;
 
 public interface IngresoValido {
     

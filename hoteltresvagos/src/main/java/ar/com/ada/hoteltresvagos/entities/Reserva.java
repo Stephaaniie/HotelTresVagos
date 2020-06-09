@@ -3,16 +3,7 @@ package ar.com.ada.hoteltresvagos.entities;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.Future;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -37,7 +28,6 @@ public class Reserva {
     @Column(name = "fecha_ingreso")
     private Date fechaIngreso;
 
-
     @Column(name = "fecha_egreso")
     private Date fechaEgreso;
 
@@ -58,6 +48,10 @@ public class Reserva {
     @ManyToOne 
     @JoinColumn(name = "huesped_id",referencedColumnName = "huesped_id")
     private Huesped huesped;
+
+    public Reserva(){
+
+    }
 
     public int getReservaId() {
         return reservaId;

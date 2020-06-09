@@ -1,18 +1,16 @@
 package ar.com.ada.hoteltresvagos.managers;
 
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
-
-import javax.persistence.Query;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
-import ar.com.ada.hoteltresvagos.entities.Reserva;
+import javax.persistence.Query;
+
+import ar.com.ada.hoteltresvagos.entities.*;
 
 public class ReservaManager {
     
@@ -66,60 +64,89 @@ protected SessionFactory sessionFactory;
         session.close();
     }
 
-    public void delete(Reserva reserva) {
+    public void delete(List<Reserva> list) {
 
         Session session = sessionFactory.openSession();
         session.beginTransaction();
 
-        session.delete(reserva);
+        for (Reserva reserva : list) {
+            session.delete(reserva);
+        }
 
         session.getTransaction().commit();
         session.close();
     }
 
-/**
- * Este metodo en la vida real no debe existir ya qeu puede haber miles de
- * usuarios
- * 
- * @return
- */
-    public List<Reserva> buscarTodas() {
+    public List<Reserva> getReservas() {
+
         Session session = sessionFactory.openSession();
-        Query query = session.createNativeQuery("SELECT * FROM reserva", Reserva.class);
-        List<Reserva> todos = query.getResultList();
-        return todos;
+
+        Query query = session.createNativeQuery("select * from reserva", Reserva.class);
+        
+        List<Reserva> todas = query.getResultList();
+
+        return todas;
     }
 
-/**
- * Busca una lista de huespedes por el nombre completo Esta armado para que se
- * pueda generar un SQL Injection y mostrar commo NO debe programarse.
- * 
- * @param nombre
- * @return
- */
-
-    public List<Reserva> buscarTodas(String nombre) {
+    public List<Reserva> getReservasId(int id) {
         Session session = sessionFactory.openSession();
-        Query query = session.createNativeQuery("SELECT * FROM reserva where nombre = '" + nombre + "'", Reserva.class);
+        
+        Query query = session.createNativeQuery("selct * from reserva where reserva_id = ?", Reserva.class);
+
+        query.setParameter(1, id);
+
         List<Reserva> reservas = query.getResultList();
-	    return reservas;
+
+        return reservas;
+        
     }
 
-    public List<Reserva> buscarTodas(int tipo, String dato) {
-        Session session = sessionFactory.openSession();
-        List<Reserva> reservas;
-        if(dato.equals("dni")){
-            Query query = session.createNativeQuery("select * from huesped where dni = " + tipo, Reserva.class);
-            reservas = query.getResultList();
-        }else{
-            Query query = session.createNativeQuery("select * from huesped where huesped_id = "+ tipo, Reserva.class);
-            reservas = query.getResultList();
-        }
-	    return reservas;
+    public List<Reserva> getRservasDniH(int dni) {
+	    Session session = sessionFactory.openSession();
+
+        Query query = session.createNativeQuery("select * from reserva r inner join huesped h on h.huesped_id = r.huesped_id where dni = ?", Reserva.class);
+
+        query.setParameter(1, dni);
+
+        List<Reserva> reservas = query.getResultList();
+
+        return reservas;
     }
 
-    public List<Reserva> buscarTodas(Date ingresarFecha) {
+    public List<Reserva> getRservasNombre(String nombre) {
         Session session = sessionFactory.openSession();
-	    return null;
+        
+        Query query = session.createNativeQuery("selct * from reserva r inner join huesped h on h.huesped_id = r.huesped_id where nombre = ?", Reserva.class);
+
+        query.setParameter(1, nombre);
+
+        List<Reserva> reservas = query.getResultList();
+
+        return reservas;
     }
+
+    public List<Reserva> getRservasFecha(String fecha, String tipoFecha) {
+	    Session session = sessionFactory.openSession();
+
+        Query query = session.createNativeQuery("selct * from reserva where "+tipoFecha+"= ?", Reserva.class);
+
+        query.setParameter(1,fecha);
+
+        List<Reserva> reservas = query.getResultList();
+        
+        return reservas;
+    }
+
+    public Reserva getReservaConId(int id) {
+        Session session = sessionFactory.openSession();
+
+        Query query = session.createNativeQuery("select * from reserva r inner join huesped h on h.huesped_id = r.huesped_id where huesped_id = ?", Reserva.class);
+
+        query.setParameter(1, id);
+
+        Reserva reserva = (Reserva) query.getSingleResult();
+
+	    return reserva;
+    }
+
 }

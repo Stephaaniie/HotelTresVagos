@@ -3,15 +3,12 @@ package ar.com.ada.hoteltresvagos.managers;
 import java.util.List;
 import java.util.logging.Level;
 
-import javax.persistence.Query;
-
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
+import org.hibernate.*;
+import org.hibernate.boot.*;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
-import ar.com.ada.hoteltresvagos.entities.Huesped;
+import ar.com.ada.hoteltresvagos.entities.*;
 
 public class HuespedManager {
 
@@ -76,7 +73,7 @@ public class HuespedManager {
         session.close();
     }
 
-    public void delete(Huesped huesped) {
+    public void delete(List<Huesped> huesped) {
 
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -87,50 +84,74 @@ public class HuespedManager {
         session.close();
     }
 
-    /**
-     * Este metodo en la vida real no debe existir ya qeu puede haber miles de
-     * usuarios
-     * 
-     * @return
-     */
-    public List<Huesped> buscarTodos() {
-
+	public List<Reserva> getReservasPorDni(int dni) {
         Session session = sessionFactory.openSession();
 
-        /// NUNCA HARCODEAR SQLs nativos en la aplicacion.
-        // ESTO es solo para nivel educativo
-        Query query = session.createNativeQuery("SELECT * FROM huesped", Huesped.class);
-        //query = session.createQuery("From Obse")
+        Query query = session.createNativeQuery("select * from reserva r inner join huesped h on h.huesped_id = r.huesped_id where dni = ?", Reserva.class);
+
+        query.setParameter(1, dni);
+
+        List<Reserva> reservas = query.getResultList();
+
+        return reservas;
+	}
+
+	public List<Huesped> getHuespedes() {
+        Session session = sessionFactory.openSession();
+
+        Query query = session.createNativeQuery("select * from huesped", Huesped.class);
+        
         List<Huesped> todos = query.getResultList();
 
         return todos;
-
     }
 
-    /**
-     * Busca una lista de huespedes por el nombre completo Esta armado para que se
-     * pueda generar un SQL Injection y mostrar commo NO debe programarse.
-     * 
-     * @param nombre
-     * @return
-     */
-    public List<Huesped> buscarPor(String nombre) {
-
+	public List<Huesped> getHuespedesConNombre(String nombre) {
         Session session = sessionFactory.openSession();
 
-        // SQL Injection vulnerability exposed.
-        // Deberia traer solo aquella del nombre y con esto demostrarmos que trae todas
-        // si pasamos
-        // como nombre: "' or '1'='1"
-        Query query = session.createNativeQuery("SELECT * FROM huesped where nombre = '" + nombre + "'", Huesped.class);
+        Query query = session.createNativeQuery("select * from huesped where nombre = ?", Huesped.class);
+
+        query.setParameter(1, nombre);
 
         List<Huesped> huespedes = query.getResultList();
+
         return huespedes;
+	}
 
+	public List<Huesped> getHuespedConId(int id) {
+		Session session = sessionFactory.openSession();
+
+        Query query = session.createNativeQuery("select * from reserva r inner join huesped h on h.huesped_id = r.huesped_id where h.huesped_id = ?", Huesped.class);
+
+        query.setParameter(1, id);
+
+        List<Huesped> huespeds = query.getResultList();
+
+        return huespeds;
+	}
+
+	public Huesped getHuespededPorFecha(String fecha) {
+        Session session = sessionFactory.openSession();
+
+        Query query = session.createNativeQuery("select * from reserva r inner join huesped h on h.huesped_id = r.huesped_id where r.fecha_reserva = ?", Reserva.class);
+
+        query.setParameter(1, fecha);
+
+        Huesped huesped = (Huesped) query.getSingleResult();
+        
+	    return huesped;
     }
+    
+    public Huesped getHuespedConDni(int dni) {
+        Session session = sessionFactory.openSession();
 
-	public List<Huesped> buscarPor(int tipo) {
-		return null;
+        Query query = session.createNativeQuery("select * from reserva r inner join huesped h on h.huesped_id = r.huesped_id where h.dni = ?", Reserva.class);
+
+        query.setParameter(1, dni);
+        
+        Huesped huesped = (Huesped) query.getSingleResult();
+        
+	    return huesped;
 	}
 
 }
