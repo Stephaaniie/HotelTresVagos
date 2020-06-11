@@ -5,19 +5,17 @@ import java.util.Scanner;
 
 import ar.com.ada.hoteltresvagos.entities.*;
 import ar.com.ada.hoteltresvagos.excepciones.HuespedDNIException;
-import ar.com.ada.hoteltresvagos.service.HuespedService;
-import ar.com.ada.hoteltresvagos.service.ReservaService;
 import ar.com.ada.hoteltresvagos.service.Service;
 
 public class Menu {
 
     private static final Scanner Teclado = new Scanner(System.in);
 
-    private Service service = new Service();
+    private Service service;
 
-    private HuespedService hService = new HuespedService(new Huesped());
-
-    private ReservaService rService = new ReservaService(new Reserva());
+    public Menu(Service service){
+        this.service = service;
+    }
 
     public void lisarReservas(List<Reserva> reservas) {
         for (Reserva x : reservas) {
@@ -45,7 +43,7 @@ public class Menu {
 
     public void listarHabitacion(List<Habitacion> habitaciones) {
         for (Habitacion a : habitaciones) {
-            System.out.println("");
+            System.out.println(""+a);
         }
     }
 
@@ -67,7 +65,7 @@ public class Menu {
     public void opcionAModificarH(int id) throws HuespedDNIException {
         Huesped huesped = service.buscarHuesped(id);
         if (huesped != null) {
-            hService.generarModificacion(huesped,solicitarInt("modificar: \n1: Nombre, \n2: DNI:, \n3: Domicilio, \n4: Domicilio Alternativo"));
+            this.service.getHuService().generarModificacion(huesped,solicitarInt("modificar: \n1: Nombre, \n2: DNI:, \n3: Domicilio, \n4: Domicilio Alternativo"));
         }else{
             error();
         }
@@ -76,7 +74,7 @@ public class Menu {
     public void opcionAModificarR(int id) throws HuespedDNIException {
         Reserva reserva = service.buscarReserva(id);
         if (reserva != null) {
-            rService.generarModificacion(reserva,solicitarInt("modificar: \n1: fecha ingreso, \n2: fecha egreso:"));
+            this.service.getrService().generarModificacion(reserva,solicitarInt("modificar: \n1: fecha ingreso, \n2: fecha egreso:"));
         }else{
             error();
         }
@@ -84,16 +82,16 @@ public class Menu {
     public void opcionesParaBorrar(int opcion) {
         switch (opcion) {
             case 1:
-                hService.generarBaja(solicitarInt("Id"), "ID", null);
+                this.service.getHuService().generarBaja(solicitarInt("Id"), "ID", null);
                 break;
             case 2:
-                hService.generarBaja(solicitarInt("DNI"), "dni", null);
+                this.service.getHuService().generarBaja(solicitarInt("DNI"), "dni", null);
                 break;
             case 3:
-                hService.generarBaja(0, "nombre", solicitarString("nombre"));
+                this.service.getHuService().generarBaja(0, "nombre", solicitarString("nombre"));
                 break;
             case 4:
-                hService.generarBaja(0, "fecha", solicitarString("fecha"));
+                this.service.getHuService().generarBaja(0, "fecha", solicitarString("fecha"));
                 break;
             default:
                 break;
@@ -103,16 +101,16 @@ public class Menu {
     public void opcionesParaBorrarR(int opcion) {
         switch (opcion) {
             case 1:
-                rService.generarBaja(solicitarInt("Id"), "ID", null, null);
+                this.service.getrService().generarBaja(solicitarInt("Id"), "ID", null, null);
                 break;
             case 2:
-                rService.generarBaja(solicitarInt("DNI"), "dni", null,null);
+                this.service.getrService().generarBaja(solicitarInt("DNI"), "dni", null,null);
                 break;
             case 3:
-                rService.generarBaja(0, "nombre", solicitarString("nombre"),null);
+                this.service.getrService().generarBaja(0, "nombre", solicitarString("nombre"),null);
                 break;
             case 4:
-                rService.generarBaja(0, "fecha",null, solicitarString("fecha"));
+                this.service.getrService().generarBaja(0, "fecha",null, solicitarString("fecha"));
                 break;
             default:
                 break;
@@ -146,7 +144,7 @@ public class Menu {
     public void opcionDeHuesped(int opcion) throws Exception {
         switch (opcion) {
             case 1:
-                hService.generarAlta();
+                this.service.getHuService().generarAlta(new Huesped());
                 break;
             case 2:
                 printOpcionesBorrar();
@@ -156,16 +154,16 @@ public class Menu {
                 opcionAModificarH(solicitarInt("Id :"));
                 break;
             case 4:
-                listarHuesped(service.listaDeHuespeds("todo", null, 0));
+                listarHuesped(this.service.listaDeHuespeds("todo", null, 0));
                 break;
             case 5:
-                listarHuesped(service.listaDeHuespeds("ID", null, solicitarInt("ID")));
+                listarHuesped(this.service.listaDeHuespeds("ID", null, solicitarInt("ID")));
                 break;
             case 6:
-                listarHuesped(service.listaDeHuespeds("nombre", solicitarString("nombre"),0));
+                listarHuesped(this.service.listaDeHuespeds("nombre", solicitarString("nombre"),0));
             break;
             case 7:
-                listarHuesped(service.listaDeHuespeds("dni", null, solicitarInt("DNI")));
+                listarHuesped(this.service.listaDeHuespeds("dni", null, solicitarInt("DNI")));
             break;
             default:
                 error();
@@ -176,7 +174,7 @@ public class Menu {
     public void opcionDeReserva(int opcion) throws Exception {
         switch (opcion) {
             case 1:
-                rService.generarAlta();
+                this.service.getrService().generarAlta(new Reserva());
                 break;
             case 2:
                 printOpcionesBorrar();
@@ -186,25 +184,25 @@ public class Menu {
                 opcionAModificarR(solicitarInt("ID"));
                 break;
             case 4:
-                lisarReservas(service.listaDeReservas("todo",0, null,null));
+                lisarReservas(this.service.listaDeReservas("todo",0, null,null));
             break;
             case 5:
-                lisarReservas(service.listaDeReservas("ID", solicitarInt("ID"), null,null));
+                lisarReservas(this.service.listaDeReservas("ID", solicitarInt("ID"), null,null));
                 break;
             case 6:
-                lisarReservas(service.listaDeReservas("nombre",0, solicitarString("nombre"),null));
+                lisarReservas(this.service.listaDeReservas("nombre",0, solicitarString("nombre"),null));
             break;
             case 7:
-                lisarReservas(service.listaDeReservas("dni", solicitarInt("DNI"), null,null));
+                lisarReservas(this.service.listaDeReservas("dni", solicitarInt("DNI"), null,null));
                 break;
             case 8:
-                lisarReservas(service.listaDeReservas("fecha_i", 0, null,solicitarString("Fecha de Ingreso")));
+                lisarReservas(this.service.listaDeReservas("fecha_i", 0, null,solicitarString("Fecha de Ingreso")));
                 break;
             case 9:
-                lisarReservas(service.listaDeReservas("fecha_e", 0, null,solicitarString("Fecha de Egreso")));
+                lisarReservas(this.service.listaDeReservas("fecha_e", 0, null,solicitarString("Fecha de Egreso")));
             break;
             case 10:
-                lisarReservas(service.listaDeReservas("fecha_r", 0, null,solicitarString("Fecha de Reserva")));
+                lisarReservas(this.service.listaDeReservas("fecha_r", 0, null,solicitarString("Fecha de Reserva")));
                 break;
             default:
                 error();
@@ -215,19 +213,19 @@ public class Menu {
     public void opcionesHabitacion(int opcion) {
         switch (opcion) {
             case 1:
-                listarHabitacion(service.listaDeHabitacion("precios",null));
+                listarHabitacion(this.service.listaDeHabitacion("precios",null));
                 break;
             case 2:
-                listarHabitacion(service.listaDeHabitacion("ocupados",null));
+                listarHabitacion(this.service.listaDeHabitacion("ocupados",null));
                 break;
             case 3:
-                listarHabitacion(service.listaDeHabitacion("libres",null));
+                listarHabitacion(this.service.listaDeHabitacion("libres",null));
                 break;
             case 4:
-                listarHabitacion(service.listaDeHabitacion("todo",null));
+                listarHabitacion(this.service.listaDeHabitacion("todo",null));
                 break;
             case 5:
-                listarHabitacion(service.listaDeHabitacion("fecha",solicitarString("fecha")));
+                listarHabitacion(this.service.listaDeHabitacion("fecha",solicitarString("fecha")));
                 break;
             default:
                 error();
@@ -238,19 +236,19 @@ public class Menu {
     public void opcionesTransacion(int opcion) {
         switch (opcion) {
             case 1:
-                listarTransaccion(service.lEstadoDePagos("todo", null, 0));
+                listarTransaccion(this.service.lEstadoDePagos("todo", null, 0));
                 break;
             case 2:
-                listarTransaccion(service.lEstadoDePagos("deudores", null, 0));
+                listarTransaccion(this.service.lEstadoDePagos("deudores", null, 0));
                 break;
             case 3:
-                listarTransaccion(service.lEstadoDePagos("noDeudores", null, 0));
+                listarTransaccion(this.service.lEstadoDePagos("noDeudores", null, 0));
                 break;
             case 4:
-                listarTransaccion(service.lEstadoDePagos("dni", null,solicitarInt("dni")));
+                listarTransaccion(this.service.lEstadoDePagos("dni", null,solicitarInt("dni")));
                 break;
             case 5:
-                listarTransaccion(service.lEstadoDePagos("nombre",solicitarString("nombre"), 0));
+                listarTransaccion(this.service.lEstadoDePagos("nombre",solicitarString("nombre"), 0));
                 break;
             default:
                 error();
@@ -271,7 +269,7 @@ public class Menu {
     
     public void printOpciones() {
         System.out.println("=======================================================");
-        System.out.println("Bienvenido le gustaria realizar realizar consultas en: ");
+        System.out.println("Bienvenido le gustaria realizar consultas en: ");
         System.out.println("");
         System.out.println("1. Huesped.");
         System.out.println("2. Reserva.");

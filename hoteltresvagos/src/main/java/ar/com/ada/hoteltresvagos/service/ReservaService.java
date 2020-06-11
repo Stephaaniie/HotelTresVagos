@@ -19,27 +19,22 @@ public class ReservaService {
 
     protected SessionFactory sessionFactory;
 
-    private Service service = new Service();
+    private Service service = new Service(this);
 
     private Reserva reserva;
 
-    private Alta alta;
-
-    private Baja baja;
-
-    private Modificacion modificacion;
+    private Funcionalidad funcionalidad;
 
     List<Reserva> reservas = new ArrayList<>();
 
     public ReservaService(Reserva reserva) {
         this.reserva = reserva;
-        this.alta = new Alta(reserva);
-        this.baja = new Baja(reserva);
-        this.modificacion = new Modificacion(reserva);
+
+        this.funcionalidad = new Funcionalidad(this.reserva);
     }
 
-    public void generarAlta() throws Exception {
-        this.alta.alta(this.reserva);
+    public void generarAlta(Reserva reserva2) throws Exception {
+        this.funcionalidad.alta(this.reserva);
         generarHuesped(reserva);
         managerReserva.create(reserva);
     }
@@ -52,18 +47,25 @@ public class ReservaService {
             if (service.existeHuespedEnBD(id)) {
                 huesped = service.buscarHuesped(id);
             }else{
-                huesped = alta.alta(huesped);
+                huesped = funcionalidad.alta(huesped);
             }
         }
         reserva.setHuesped(huesped);
     }
 
+    public List<Reserva> darBajaReservas(int dato,String opcion, String nombre,String fecha) {
+        List<Reserva> reservas = this.service.listaDeReservas(opcion, dato, nombre, fecha);
+        if (reserva == null) {
+            System.out.println("reserva no encontrada.");
+        }
+        return reservas;
+    }
     public void generarBaja(int dato,String opcion,String nombre, String fecha) {
-        managerReserva.delete(baja.darBajaReservas(dato, opcion, nombre, fecha));
+        managerReserva.delete(darBajaReservas(dato, opcion, nombre, fecha));
     }
 
     public void generarModificacion(Reserva reserva,int opcion) {
-        modificacion.modificar(opcion, reserva);
+        funcionalidad.modificar(opcion, reserva);
         managerReserva.update(reserva);
     }
 

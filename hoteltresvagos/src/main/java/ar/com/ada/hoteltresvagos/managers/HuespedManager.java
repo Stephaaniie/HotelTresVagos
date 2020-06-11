@@ -2,11 +2,13 @@ package ar.com.ada.hoteltresvagos.managers;
 
 import java.util.List;
 import java.util.logging.Level;
-
-import org.hibernate.*;
-import org.hibernate.boot.*;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+
+import javax.persistence.Query;
 
 import ar.com.ada.hoteltresvagos.entities.*;
 
@@ -152,6 +154,6 @@ public class HuespedManager {
         Huesped huesped = (Huesped) query.getSingleResult();
         
 	    return huesped;
-	}
-
+    }
+    
 }

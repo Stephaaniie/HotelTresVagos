@@ -34,35 +34,68 @@ public class Service {
 
     public static final String TODO = "todo";
 
-    protected HuespedManager huespedManager = new HuespedManager();
+    protected static HuespedManager huespedManager;
 
-    protected ReservaManager reservaManager = new ReservaManager();
+    protected static ReservaManager reservaManager;
 
-    protected HabitacionManager habitacionManager = new HabitacionManager();
+    protected HabitacionManager habitacionManager;
 
-    protected EstadoPagoManager ePagoManager = new EstadoPagoManager();
+    protected EstadoPagoManager ePagoManager;
 
+    private EstadoService eService;
 
-	public List<Reserva> buscarPor(int tipo) {
+    private HabitacionService hService;
+
+    private ReservaService rService;
+
+    private HuespedService huService;
+
+    public Service(HuespedManager huespedManager, ReservaManager reservaManager, HabitacionManager habitacionManager,EstadoPagoManager ePagoManager) {
+        Service.huespedManager = huespedManager;
+
+        Service.reservaManager = reservaManager;
+
+        this.habitacionManager = habitacionManager;
+
+        this.ePagoManager = ePagoManager;
+    }
+
+    public Service(HuespedService huService) {
+        this.huService = huService;
+    }
+
+    public Service(EstadoService eService) {
+        this.eService = eService;
+    }
+
+    public Service(HabitacionService hService) {
+        this.hService = hService;
+    }
+
+    public Service(ReservaService rService) {
+        this.rService = rService;
+    }
+
+    public static List<Reserva> buscarPor(int tipo) {
         return huespedManager.getReservasPorDni(tipo);
     }
-    
+
     public boolean existeHuespedEnBD(int id) {
         boolean existe = false;
-        if(huespedManager.getHuespedConDni(id) != null)
-		    existe = true;
+        if (huespedManager.getHuespedConDni(id) != null)
+            existe = true;
         return existe;
     }
-    
-	public Huesped buscarHuesped(int id) {
-		return huespedManager.getHuespedConDni(id);
-    }
-    
-    public Reserva buscarReserva(int id) {
-		return reservaManager.getReservaConId(id);
-	}
 
-    public List<Reserva> listaDeReservas(String opcion,int dato, String nombre,String fecha){
+    public Huesped buscarHuesped(int id) {
+        return huespedManager.getHuespedConDni(id);
+    }
+
+    public Reserva buscarReserva(int id) {
+        return reservaManager.getReservaConId(id);
+    }
+
+    public List<Reserva> listaDeReservas(String opcion, int dato, String nombre, String fecha) {
         List<Reserva> reservas = new ArrayList<>();
         switch (opcion) {
             case TODO:
@@ -158,5 +191,69 @@ public class Service {
                 break;
         }
         return lestadoPago;
+    }
+
+    public static HuespedManager getHuespedManager() {
+        return huespedManager;
+    }
+
+    public static void setHuespedManager(HuespedManager huespedManager) {
+        Service.huespedManager = huespedManager;
+    }
+
+    public static ReservaManager getReservaManager() {
+        return reservaManager;
+    }
+
+    public static void setReservaManager(ReservaManager reservaManager) {
+        Service.reservaManager = reservaManager;
+    }
+
+    public HabitacionManager getHabitacionManager() {
+        return habitacionManager;
+    }
+
+    public void setHabitacionManager(HabitacionManager habitacionManager) {
+        this.habitacionManager = habitacionManager;
+    }
+
+    public EstadoPagoManager getePagoManager() {
+        return ePagoManager;
+    }
+
+    public void setePagoManager(EstadoPagoManager ePagoManager) {
+        this.ePagoManager = ePagoManager;
+    }
+
+    public EstadoService geteService() {
+        return eService;
+    }
+
+    public void seteService(EstadoService eService) {
+        this.eService = eService;
+    }
+
+    public HabitacionService gethService() {
+        return hService;
+    }
+
+    public void sethService(HabitacionService hService) {
+        this.hService = hService;
+    }
+
+    public ReservaService getrService() {
+        return rService;
+    }
+
+    public void setrService(ReservaService rService) {
+        this.rService = rService;
+    }
+
+    public HuespedService getHuService() {
+        return huService;
+    }
+
+    public void setHuService(HuespedService huService) {
+        this.huService = huService;
     }
 }

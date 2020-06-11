@@ -16,40 +16,41 @@ public class HuespedService {
 
     protected SessionFactory sessionFactory;
 
-    private Service service = new Service();
-
     private Huesped huesped;
 
-    private Alta alta;
-
-    private Baja baja;
-
-    private Modificacion modificacion;
+    private Funcionalidad funcionalidad;
 
     List<Reserva> reservas = new ArrayList<>();
 
+    private Service service = new Service(this);
+
     public HuespedService(Huesped huesped) {
         this.huesped = huesped;
-        this.alta = new Alta(this.huesped);
-        this.baja = new Baja(this.huesped);
-        this.modificacion = new Modificacion(this.huesped);
+        this.funcionalidad = new Funcionalidad(this.huesped);
     }
 
-    public void generarAlta() throws Exception {
-        this.alta.alta(this.huesped);
+    public void generarAlta(Huesped huesped2) throws Exception {
+        this.funcionalidad.alta(this.huesped);
         Reserva reserva = new Reserva();
-        reservas = service.buscarPor(this.huesped.getDni());
+        reservas = Service.buscarPor(this.huesped.getDni());
         reservas.add(reserva);
         this.huesped.setReservas(reservas);
         managerHuesped.create(this.huesped);
     }
+    public List<Huesped> darBaja(int dato,String opcion, String nombre, String fecha) {
+        List<Huesped> huespeds = this.service.listaDeHuespeds(opcion, nombre, dato);
+        if (huespeds == null) {
+            System.out.println("Huesped no encontrado.");
+        }
+        return huespeds;
+    }
 
     public void generarBaja(int dato,String opcion,String nombre) {
-        managerHuesped.delete(baja.darBaja(dato,opcion,nombre));
+        managerHuesped.delete(funcionalidad.darBaja(dato,opcion,nombre));
     }
 
     public void generarModificacion(Huesped huesped,int opcion) throws HuespedDNIException {
-        modificacion.modificar(opcion, huesped);
+        funcionalidad.modificar(opcion, huesped);
         managerHuesped.update(huesped);
     }
 
