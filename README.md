@@ -1,1 +1,1 @@
-# hotel_tres_vagos
+# HotelTresVagos
